@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Persona
-//
-//  Created by Dennis Lam on 11/27/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
