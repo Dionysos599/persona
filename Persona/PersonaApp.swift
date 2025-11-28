@@ -35,7 +35,27 @@ struct PersonaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task {
+                    await configureAIService()
+                }
         }
         .modelContainer(modelContainer)
+    }
+    
+    // MARK: - AIService Configuration
+    
+    @MainActor
+    private func configureAIService() async {
+        let apiKey = UserDefaults.standard.string(forKey: Constants.StorageKeys.apiKey) ?? ""
+        let apiBaseURL = UserDefaults.standard.string(forKey: Constants.StorageKeys.apiBaseURL) ?? Constants.API.defaultBaseURL
+        let apiModel = UserDefaults.standard.string(forKey: Constants.StorageKeys.apiModel) ?? Constants.API.defaultModel
+        
+        if let baseURL = URL(string: apiBaseURL) {
+            await AIService.shared.configure(
+                apiKey: apiKey,
+                baseURL: baseURL,
+                model: apiModel
+            )
+        }
     }
 }

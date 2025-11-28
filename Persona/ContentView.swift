@@ -89,3 +89,4 @@ struct ContentView: View {
     ContentView()
         .modelContainer(for: [Persona.self, Post.self, Conversation.self, Message.self])
 }
+

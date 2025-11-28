@@ -1,20 +1,57 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(Router.self) private var router
+    
     var body: some View {
-        VStack {
-            Image(systemName: "gearshape")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("设置")
-                .font(.title2)
-                .fontWeight(.semibold)
-            Text("Settings View - Coming Soon")
-                .foregroundStyle(.secondary)
-                .padding(.top, 8)
+        List {
+            Section("AI 配置") {
+                NavigationLink(value: AppRoute.apiSettings) {
+                    HStack {
+                        Image(systemName: "key.fill")
+                            .foregroundStyle(Color.personaPrimary)
+                        Text("API 设置")
+                    }
+                }
+            }
+            
+            Section("关于") {
+                HStack {
+                    Text("版本")
+                    Spacer()
+                    Text("1.0.0")
+                        .foregroundStyle(.secondary)
+                }
+                
+                HStack {
+                    Text("构建")
+                    Spacer()
+                    Text("1")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
+            Section {
+                Text("Persona - 构建你的 AI 化身，定义下一代社交网络")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .navigationTitle("设置")
         .navigationBarTitleDisplayMode(.large)
+        .navigationDestination(for: AppRoute.self) { route in
+            destinationView(for: route)
+        }
+    }
+    
+    @ViewBuilder
+    private func destinationView(for route: AppRoute) -> some View {
+        switch route {
+        case .apiSettings:
+            APISettingsView()
+        default:
+            EmptyView()
+        }
     }
 }
 
@@ -22,5 +59,6 @@ struct SettingsView: View {
     NavigationStack {
         SettingsView()
     }
+    .environment(Router())
 }
 

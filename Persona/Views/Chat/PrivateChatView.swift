@@ -31,14 +31,19 @@ struct PrivateChatView: View {
     
     private func loadOrCreatePrivateConversation() {
         // Find existing private conversation or create new one
-        if let existing = persona.conversations.first(where: { $0.isPrivateChat }) {
+        let conversations = persona.conversations
+        if let existing = conversations.first(where: { $0.isPrivateChat }) {
             conversation = existing
         } else {
             let newConversation = Conversation(persona: persona, isPrivateChat: true)
             modelContext.insert(newConversation)
             persona.conversations.append(newConversation)
-            try? modelContext.save()
-            conversation = newConversation
+            do {
+                try modelContext.save()
+                conversation = newConversation
+            } catch {
+                print("Failed to create conversation: \(error)")
+            }
         }
     }
 }
