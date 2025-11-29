@@ -299,8 +299,7 @@ private struct PersonaPostCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: Constants.Spacing.sm) {
-            Text(post.content)
-                .font(.body)
+            MarkdownText(content: post.content)
                 .lineLimit(nil)
             
             HStack {

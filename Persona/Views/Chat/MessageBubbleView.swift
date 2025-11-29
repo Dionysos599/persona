@@ -25,12 +25,20 @@ struct MessageBubbleView: View {
             }
             
             VStack(alignment: isFromUser ? .trailing : .leading, spacing: 4) {
-                Text(content)
-                    .padding(.horizontal, Constants.Spacing.md)
-                    .padding(.vertical, Constants.Spacing.sm)
-                    .background(isFromUser ? Color.personaPrimary : Color.secondaryBackground)
-                    .foregroundStyle(isFromUser ? Color.white : .primary)
-                    .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.medium))
+                if isFromUser {
+                    Text(content)
+                        .padding(.horizontal, Constants.Spacing.md)
+                        .padding(.vertical, Constants.Spacing.sm)
+                        .background(Color.personaPrimary)
+                        .foregroundStyle(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.medium))
+                } else {
+                    MarkdownText(content: content, isStreaming: isStreaming)
+                        .padding(.horizontal, Constants.Spacing.md)
+                        .padding(.vertical, Constants.Spacing.sm)
+                        .background(Color.secondaryBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.medium))
+                }
                 
                 if isStreaming {
                     TypingIndicator()

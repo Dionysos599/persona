@@ -25,6 +25,7 @@ final class Persona {
         说话风格：\(voiceStyle)
         兴趣爱好：\(interests.joined(separator: "、"))
         请始终保持角色设定，以真实的方式回应。
+        在回复时，你可以使用 Markdown 格式来增强表达，例如：**粗体**、*斜体*、列表、`代码块`、> 引用等，但请适度使用，保持自然。
         """
     }
 

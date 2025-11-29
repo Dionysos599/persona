@@ -49,8 +49,7 @@ struct PostDetailView: View {
                 
                 Divider()
                 
-                Text(post.content)
-                    .font(.body)
+                MarkdownText(content: post.content)
                     .lineSpacing(6)
                 
                 if let imageData = post.imageData,

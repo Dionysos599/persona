@@ -30,8 +30,7 @@ struct PostCardView: View {
                 onAuthorTap()
             }
             
-            Text(post.content)
-                .font(.body)
+            MarkdownText(content: post.content)
                 .lineLimit(nil)
             
             if let imageData = post.imageData,
