@@ -16,7 +16,6 @@ struct PostDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Constants.Spacing.lg) {
-                // Author section
                 HStack {
                     PersonaAvatarView(persona: post.author, size: Constants.AvatarSize.large)
                     
@@ -50,12 +49,10 @@ struct PostDetailView: View {
                 
                 Divider()
                 
-                // Content
                 Text(post.content)
                     .font(.body)
                     .lineSpacing(6)
                 
-                // Image if present
                 if let imageData = post.imageData,
                    let uiImage = UIImage(data: imageData) {
                     Image(uiImage: uiImage)
@@ -64,7 +61,6 @@ struct PostDetailView: View {
                         .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.medium))
                 }
                 
-                // Metadata
                 HStack {
                     Text(post.createdAt.formatted(date: .abbreviated, time: .shortened))
                         .font(.caption)
@@ -75,7 +71,6 @@ struct PostDetailView: View {
                 
                 Divider()
                 
-                // Actions
                 HStack(spacing: Constants.Spacing.xl) {
                     Button {
                         withAnimation(Constants.Animation.spring) {
@@ -107,7 +102,6 @@ struct PostDetailView: View {
         .navigationTitle("动态详情")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            // Check if any Persona has liked this post
             isLiked = allPersonas.contains { persona in
                 post.likedByPersonas.contains(where: { $0.id == persona.id })
             }
@@ -115,7 +109,6 @@ struct PostDetailView: View {
     }
     
     private func handleLike() {
-        // Use the first Persona for liking (or could show a picker in the future)
         guard let persona = anyPersona else { return }
         
         if post.likedByPersonas.contains(where: { $0.id == persona.id }) {

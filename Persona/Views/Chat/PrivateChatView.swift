@@ -30,7 +30,6 @@ struct PrivateChatView: View {
     }
     
     private func loadOrCreatePrivateConversation() {
-        // Find existing private conversation or create new one
         let conversations = persona.conversations
         if let existing = conversations.first(where: { $0.isPrivateChat }) {
             conversation = existing

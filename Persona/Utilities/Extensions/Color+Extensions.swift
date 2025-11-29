@@ -1,35 +1,28 @@
-//
-//  Color+Extensions.swift
-//  Persona
-//
-//  Created by Claude Code on 2025-11-27.
-//
-
 import SwiftUI
 
 extension Color {
 
-    // MARK: - Brand Colors
+    // Brand Colors
 
-    /// Primary brand color - Indigo (#4F46E5)
+    /** Primary brand color - Indigo (#4F46E5) */
     static let personaPrimary = Color(red: 79/255, green: 70/255, blue: 229/255)
 
-    /// Secondary brand color - Purple (#7C3AED)
+    /** Secondary brand color - Purple (#7C3AED) */
     static let personaSecondary = Color(red: 124/255, green: 58/255, blue: 237/255)
 
-    /// Accent color for highlights
+    /** Accent color for highlights */
     static let personaAccent = Color(red: 99/255, green: 102/255, blue: 241/255)
 
-    // MARK: - Gradients
+    // Gradients
 
-    /// Primary gradient for AI-related elements
+    /** Primary gradient for AI-related elements */
     static let personaGradient = LinearGradient(
         colors: [.personaPrimary, .personaSecondary],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// Subtle gradient for backgrounds
+    /** Subtle gradient for backgrounds */
     static let subtleGradient = LinearGradient(
         colors: [
             Color(red: 79/255, green: 70/255, blue: 229/255, opacity: 0.1),
@@ -39,79 +32,77 @@ extension Color {
         endPoint: .bottomTrailing
     )
 
-    // MARK: - Semantic Colors
+    // Semantic Colors
 
-    /// Card background color (adapts to light/dark mode)
+    /** Card background color (adapts to light/dark mode) */
     static let cardBackground = Color(.systemBackground)
 
-    /// Secondary background color
+    /** Secondary background color */
     static let secondaryBackground = Color(.secondarySystemBackground)
 
-    /// Tertiary background color
+    /** Tertiary background color */
     static let tertiaryBackground = Color(.tertiarySystemBackground)
 
-    /// Primary text color
+    /** Primary text color */
     static let primaryText = Color(.label)
 
-    /// Secondary text color
+    /** Secondary text color */
     static let secondaryText = Color(.secondaryLabel)
 
-    /// Tertiary text color
+    /** Tertiary text color */
     static let tertiaryText = Color(.tertiaryLabel)
 
-    // MARK: - Status Colors
+    // Status Colors
 
-    /// Success/positive state color
+    /** Success/positive state color */
     static let success = Color.green
 
-    /// Warning/caution state color
+    /** Warning/caution state color */
     static let warning = Color.orange
 
-    /// Error/negative state color
+    /** Error/negative state color */
     static let error = Color.red
 
-    /// Info/neutral state color
+    /** Info/neutral state color */
     static let info = Color.blue
 
-    // MARK: - Message Bubble Colors
+    // Message Bubble Colors
 
-    /// User message bubble background
+    /** User message bubble background */
     static let userMessageBackground = personaPrimary
 
-    /// User message text color
+    /** User message text color */
     static let userMessageText = Color.white
 
-    /// AI message bubble background
+    /** AI message bubble background */
     static let aiMessageBackground = Color(.systemGray5)
 
-    /// AI message text color
+    /** AI message text color */
     static let aiMessageText = Color.primaryText
 
-    // MARK: - Interactive States
+    // Interactive States
 
-    /// Like/favorite color (active state)
+    /** Like/favorite color (active state) */
     static let liked = Color.pink
 
-    /// Follow button color
+    /** Follow button color */
     static let followButton = personaPrimary
 
-    /// Unfollow button color
+    /** Unfollow button color */
     static let unfollowButton = Color(.systemGray3)
 
-    // MARK: - Helper Methods
+    // Helper Methods
 
-    /// Creates a color from hex string
-    /// - Parameter hex: Hex color string (e.g., "#4F46E5" or "4F46E5")
-    /// - Returns: Color instance
+    /** Creates a color from hex string */
     static func hex(_ hex: String) -> Color {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
         let r, g, b, a: UInt64
         switch hex.count {
-        case 6: // RGB
+        case 6:
             (r, g, b, a) = ((int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF, 255)
-        case 8: // RGBA
+        case 8:
             (r, g, b, a) = ((int >> 24) & 0xFF, (int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
         default:
             (r, g, b, a) = (0, 0, 0, 255)
@@ -126,10 +117,10 @@ extension Color {
     }
 }
 
-// MARK: - ShapeStyle Extension for Gradients
+// ShapeStyle Extension for Gradients
 
 extension ShapeStyle where Self == LinearGradient {
-    /// Primary persona gradient as ShapeStyle
+    /** Primary persona gradient as ShapeStyle */
     static var personaGradient: LinearGradient {
         LinearGradient(
             colors: [.personaPrimary, .personaSecondary],

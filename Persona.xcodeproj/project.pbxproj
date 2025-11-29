@@ -10,32 +10,9 @@
 		3BAF8B612ED8FB0E006BEFFE /* Persona.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persona.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3BAF8BD12ED9168D006BEFFE /* Exceptions for "Persona" folder in "Persona" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Models/.gitkeep,
-				Navigation/.gitkeep,
-				Services/.gitkeep,
-				Utilities/Extensions/.gitkeep,
-				ViewModels/.gitkeep,
-				Views/Chat/.gitkeep,
-				Views/Components/.gitkeep,
-				Views/Creation/.gitkeep,
-				Views/Feed/.gitkeep,
-				Views/Profile/.gitkeep,
-				Views/Settings/.gitkeep,
-			);
-			target = 3BAF8B602ED8FB0E006BEFFE /* Persona */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3BAF8B632ED8FB0E006BEFFE /* Persona */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3BAF8BD12ED9168D006BEFFE /* Exceptions for "Persona" folder in "Persona" target */,
-			);
 			path = Persona;
 			sourceTree = "<group>";
 		};

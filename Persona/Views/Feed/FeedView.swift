@@ -23,7 +23,6 @@ struct FeedView: View {
         .navigationTitle("社交广场")
         .navigationBarTitleDisplayMode(.large)
         .refreshable {
-            // Refresh logic - in a real app would fetch from server
             try? await Task.sleep(nanoseconds: 500_000_000)
         }
         .onAppear {
@@ -91,9 +90,7 @@ struct FeedView: View {
     }
     
     private func handleLike(_ post: Post) {
-        // Use the first Persona for liking (or could show a picker in the future)
         guard let persona = anyPersona else {
-            // No Persona, can't like
             return
         }
         

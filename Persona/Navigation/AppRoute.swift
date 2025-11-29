@@ -2,24 +2,20 @@ import Foundation
 import SwiftData
 
 enum AppRoute: Hashable {
-    // Feed routes
     case feed
     case postDetail(Post)
     
-    // Persona routes
-    case personaProfile(Persona)  // Profile view for any Persona (merged with myPersonaDetail)
+    case personaProfile(Persona)
     case createPersona
     case editPersona(Persona)
-    case myPersonaDetail(Persona)  // Detail view for user's own Persona (also uses PersonaDetailView)
+    case myPersonaDetail(Persona)
     
-    // Chat routes
     case chatList
     case chat(Conversation)
-    case privateChat(Persona)  // User's chat with their own Persona
+    case privateChat(Persona)
     
-    // Settings
     case settings
     case apiSettings
-    case followingList  // List of followed Personas
+    case followingList
 }
 

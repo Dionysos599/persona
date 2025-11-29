@@ -28,13 +28,11 @@ final class ChatViewModel {
         let userContent = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !userContent.isEmpty else { return }
         
-        // Add user message
         let userMessage = Message(content: userContent, isFromUser: true, conversation: conversation)
         modelContext.insert(userMessage)
         messages.append(userMessage)
         inputText = ""
         
-        // Start streaming response
         isStreaming = true
         currentStreamingText = ""
         
@@ -45,7 +43,6 @@ final class ChatViewModel {
                 currentStreamingText += chunk
             }
             
-            // Save complete response
             let assistantMessage = Message(
                 content: currentStreamingText,
                 isFromUser: false,

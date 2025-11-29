@@ -11,7 +11,6 @@ struct ChatView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Messages list
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: Constants.Spacing.md) {
@@ -20,7 +19,6 @@ struct ChatView: View {
                                 .id(message.id)
                         }
                         
-                        // Streaming message
                         if viewModel?.isStreaming == true, let streamingText = viewModel?.currentStreamingText {
                             MessageBubbleView(
                                 content: streamingText,
@@ -44,7 +42,6 @@ struct ChatView: View {
             
             Divider()
             
-            // Input bar
             HStack(spacing: Constants.Spacing.sm) {
                 TextField("输入消息...", text: Binding(
                     get: { viewModel?.inputText ?? "" },
@@ -114,7 +111,6 @@ struct ChatView: View {
                 proxy.scrollTo(lastMessage.id, anchor: .bottom)
             }
         } else if viewModel?.isStreaming == true {
-            // Scroll to show streaming message
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 withAnimation {
                     proxy.scrollTo("streaming", anchor: .bottom)

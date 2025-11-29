@@ -53,7 +53,7 @@ struct FollowingListView: View {
     }
 }
 
-// MARK: - Following List Row
+// Following List Row
 
 private struct FollowingListRow: View {
     let persona: Persona

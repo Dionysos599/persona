@@ -4,7 +4,7 @@ import PhotosUI
 
 @Observable
 final class PersonaCreationViewModel {
-    // MARK: - State
+    // State
     var name: String = ""
     var selectedTraits: Set<String> = []
     var backstory: String = ""
@@ -17,7 +17,7 @@ final class PersonaCreationViewModel {
     var errorMessage: String?
     var isAPIKeyError: Bool = false
     
-    // MARK: - Dependencies
+    // Dependencies
     private let aiService: AIService
     private let modelContext: ModelContext
     
@@ -26,12 +26,12 @@ final class PersonaCreationViewModel {
         self.modelContext = modelContext
     }
     
-    // MARK: - Computed Properties
+    // Computed Properties
     var isValid: Bool {
         !name.isEmpty && !selectedTraits.isEmpty && !backstory.isEmpty
     }
     
-    // MARK: - Actions
+    // Actions
     @MainActor
     func generateWithAI() async {
         isGenerating = true
@@ -44,7 +44,6 @@ final class PersonaCreationViewModel {
             backstory = generated.backstory
             interests = generated.interests
             
-            // Set voice style based on traits (simple heuristic)
             if generated.traits.contains("poetic") || generated.traits.contains("philosophical") {
                 voiceStyle = .poetic
             } else if generated.traits.contains("technical") || generated.traits.contains("analytical") {

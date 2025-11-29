@@ -84,7 +84,7 @@ struct PersonaDetailView: View {
         }
     }
     
-    // MARK: - Profile Header
+    // Profile Header
     
     private var profileHeader: some View {
         VStack(spacing: Constants.Spacing.md) {
@@ -94,7 +94,6 @@ struct PersonaDetailView: View {
                 .font(.title)
                 .fontWeight(.bold)
             
-            // Traits
             if !persona.personalityTraits.isEmpty {
                 HStack(spacing: Constants.Spacing.xs) {
                     ForEach(persona.personalityTraits.prefix(4), id: \.self) { traitString in
@@ -117,7 +116,6 @@ struct PersonaDetailView: View {
                 }
             }
             
-            // Interests
             if !persona.interests.isEmpty {
                 HStack(spacing: Constants.Spacing.xs) {
                     ForEach(persona.interests.prefix(3), id: \.self) { interest in
@@ -131,7 +129,7 @@ struct PersonaDetailView: View {
         .padding(.top, Constants.Spacing.md)
     }
     
-    // MARK: - Own Profile Actions
+    // Own Profile Actions
     
     private var ownProfileActions: some View {
         VStack(spacing: Constants.Spacing.md) {
@@ -199,7 +197,7 @@ struct PersonaDetailView: View {
         }
     }
     
-    // MARK: - Follow Button
+    // Follow Button
     
     private var followButton: some View {
         Button {
@@ -225,7 +223,7 @@ struct PersonaDetailView: View {
         .disabled(anyPersona == nil)
     }
     
-    // MARK: - Backstory Section
+    // Backstory Section
     
     private var backstorySection: some View {
         VStack(alignment: .leading, spacing: Constants.Spacing.sm) {
@@ -244,7 +242,7 @@ struct PersonaDetailView: View {
         .padding(.horizontal)
     }
     
-    // MARK: - Posts Section
+    // Posts Section
     
     private var postsSection: some View {
         VStack(alignment: .leading, spacing: Constants.Spacing.md) {
@@ -268,18 +266,16 @@ struct PersonaDetailView: View {
         }
     }
     
-    // MARK: - Actions
+    // Actions
     
     private func generatePost() async {
         await viewModel?.generatePost(for: persona)
     }
     
     private func toggleFollow() {
-        // Use the first Persona for following (or could show a picker in the future)
         guard let firstPersona = anyPersona else { return }
         
         if isFollowing {
-            // Unfollow
             if let index = firstPersona.following.firstIndex(where: { $0.id == persona.id }) {
                 firstPersona.following.remove(at: index)
             }
@@ -287,7 +283,6 @@ struct PersonaDetailView: View {
                 persona.followers.remove(at: index)
             }
         } else {
-            // Follow
             firstPersona.following.append(persona)
             persona.followers.append(firstPersona)
         }
@@ -297,7 +292,7 @@ struct PersonaDetailView: View {
     }
 }
 
-// MARK: - Persona Post Card
+// Persona Post Card
 
 private struct PersonaPostCard: View {
     let post: Post

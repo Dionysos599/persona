@@ -4,9 +4,9 @@ import SwiftData
 @main
 struct PersonaApp: App {
 
-    // MARK: - SwiftData Configuration
+    // SwiftData Configuration
 
-    /// SwiftData model container for persistent storage
+    /** SwiftData model container for persistent storage */
     var modelContainer: ModelContainer = {
         let schema = Schema([
             Persona.self,
@@ -30,7 +30,7 @@ struct PersonaApp: App {
         }
     }()
 
-    // MARK: - Scene
+    // Scene
 
     var body: some Scene {
         WindowGroup {
@@ -43,7 +43,7 @@ struct PersonaApp: App {
         .modelContainer(modelContainer)
     }
     
-    // MARK: - AIService Configuration
+    // AIService Configuration
     
     @MainActor
     private func configureAIService() async {
@@ -60,7 +60,7 @@ struct PersonaApp: App {
         }
     }
     
-    // MARK: - Initial Data Setup
+    // Initial Data Setup
     
     @MainActor
     private func initializeMockData() async {

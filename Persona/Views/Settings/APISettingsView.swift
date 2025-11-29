@@ -53,7 +53,6 @@ struct APISettingsView: View {
                     .autocapitalization(.none)
                     .autocorrectionDisabled()
                     .onChange(of: apiBaseURL) { oldValue, newValue in
-                        // Track if user manually edited the Base URL
                         if let modelBaseURL = Constants.API.baseURL(for: apiModel),
                            newValue != modelBaseURL {
                             isBaseURLManuallyEdited = true
@@ -62,7 +61,6 @@ struct APISettingsView: View {
                 
                 if isBaseURLManuallyEdited {
                     Button {
-                        // Reset to model's default Base URL
                         if let modelBaseURL = Constants.API.baseURL(for: apiModel) {
                             apiBaseURL = modelBaseURL
                             isBaseURLManuallyEdited = false
@@ -117,7 +115,6 @@ struct APISettingsView: View {
                     }
                 }
                 .onChange(of: apiModel) { oldValue, newValue in
-                    // Auto-update Base URL when model changes (only if not manually edited)
                     if !isBaseURLManuallyEdited, let modelBaseURL = Constants.API.baseURL(for: newValue) {
                         apiBaseURL = modelBaseURL
                     }

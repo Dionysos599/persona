@@ -17,7 +17,6 @@ final class Persona {
     @Relationship(deleteRule: .nullify) var followers: [Persona] = []
     @Relationship(deleteRule: .nullify) var following: [Persona] = []
 
-    // Computed prompt that keeps AI responses in character
     var systemPrompt: String {
         """
         你是 \(name)，一个独特的 AI 人格，具有以下特征：

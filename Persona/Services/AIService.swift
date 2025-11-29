@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-// MARK: - Request DTOs
+// Request DTOs
 
 struct ChatRequest: Encodable {
     let model: String
@@ -17,11 +17,11 @@ struct ChatRequest: Encodable {
 }
 
 struct APIMessage: Codable {
-    let role: String  // "system", "user", "assistant"
+    let role: String
     let content: String
 }
 
-// MARK: - Response DTOs
+// Response DTOs
 
 struct ChatResponse: Decodable {
     let id: String
@@ -50,7 +50,7 @@ struct StreamChunk: Decodable {
     }
 }
 
-// MARK: - Generated Persona DTO
+// Generated Persona DTO
 
 struct GeneratedPersona {
     let name: String
@@ -88,7 +88,7 @@ enum AIError: LocalizedError, Equatable {
     }
 }
 
-// MARK: - AIService
+// AIService
 
 actor AIService {
     static let shared = AIService()
@@ -104,7 +104,7 @@ actor AIService {
         self.session = URLSession(configuration: config)
     }
     
-    // MARK: - Configuration
+    // Configuration
     
     func configure(apiKey: String, baseURL: URL? = nil, model: String? = nil) {
         self.apiKey = apiKey
@@ -112,7 +112,7 @@ actor AIService {
         if let model = model { self.model = model }
     }
     
-    // MARK: - Chat (Non-streaming)
+    // Chat (Non-streaming)
     
     func chat(messages: [Message], persona: Persona) async throws -> String {
         guard !apiKey.isEmpty else {
@@ -129,13 +129,12 @@ actor AIService {
         return chatResponse.choices.first?.message.content ?? ""
     }
     
-    // MARK: - Chat (Streaming)
+    // Chat (Streaming)
     
     func chatStream(messages: [Message], persona: Persona) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             Task {
                 do {
-                    // Get actor state (need await because we're outside actor isolation)
                     let currentAPIKey = await apiKey
                     let currentBaseURL = await baseURL
                     let currentModel = await model
@@ -145,7 +144,6 @@ actor AIService {
                         return
                     }
                     
-                    // Build request (these methods are synchronous, no await needed)
                     let apiMessages = buildAPIMessages(from: messages, persona: persona)
                     let request = try buildRequest(
                         messages: apiMessages,
@@ -155,13 +153,10 @@ actor AIService {
                         model: currentModel
                     )
                     
-                    // Make request
                     let (bytes, response) = try await session.bytes(for: request)
                     try validateResponse(response)
                     
-                    // Stream response
                     for try await line in bytes.lines {
-                        // Parse SSE line (nonisolated method, no await needed)
                         if let content = parseSSELine(line) {
                             continuation.yield(content)
                         }
@@ -174,7 +169,7 @@ actor AIService {
         }
     }
     
-    // MARK: - Generate Post Content
+    // Generate Post Content
     
     func generatePost(for persona: Persona) async throws -> String {
         guard !apiKey.isEmpty else {
@@ -200,7 +195,7 @@ actor AIService {
         return chatResponse.choices.first?.message.content ?? ""
     }
     
-    // MARK: - Generate Persona
+    // Generate Persona
     
     func generatePersona() async throws -> GeneratedPersona {
         guard !apiKey.isEmpty else {
@@ -230,7 +225,6 @@ actor AIService {
         let chatResponse = try JSONDecoder().decode(ChatResponse.self, from: data)
         let jsonString = chatResponse.choices.first?.message.content ?? "{}"
         
-        // Clean JSON string (remove markdown code blocks if present)
         let cleanedJSON = jsonString
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "```json", with: "")
@@ -250,7 +244,7 @@ actor AIService {
         )
     }
     
-    // MARK: - Private Helpers
+    // Private Helpers
     
     private func buildAPIMessages(from messages: [Message], persona: Persona) -> [APIMessage] {
         var apiMessages = [APIMessage(role: "system", content: persona.systemPrompt)]
@@ -310,7 +304,6 @@ actor AIService {
     }
     
     nonisolated private func parseSSELine(_ line: String) -> String? {
-        // SSE format: "data: {json}"
         guard line.hasPrefix("data: "),
               line != "data: [DONE]" else {
             return nil

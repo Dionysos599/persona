@@ -77,7 +77,7 @@ struct MyPersonaView: View {
     }
 }
 
-// MARK: - Persona List Row
+// Persona List Row
 
 private struct PersonaListRow: View {
     let persona: Persona

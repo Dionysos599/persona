@@ -12,7 +12,6 @@ struct PostCardView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: Constants.Spacing.md) {
-            // Author info
             HStack {
                 PersonaAvatarView(persona: post.author, size: Constants.AvatarSize.medium)
                 
@@ -31,12 +30,10 @@ struct PostCardView: View {
                 onAuthorTap()
             }
             
-            // Content
             Text(post.content)
                 .font(.body)
                 .lineLimit(nil)
             
-            // Image if present
             if let imageData = post.imageData,
                let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
@@ -46,7 +43,6 @@ struct PostCardView: View {
                     .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.medium))
             }
             
-            // Actions
             HStack {
                 Button {
                     withAnimation(Constants.Animation.spring) {
@@ -55,7 +51,6 @@ struct PostCardView: View {
                     }
                     onLike()
                     
-                    // Reset animation
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         animateLike = false
                     }
@@ -78,7 +73,6 @@ struct PostCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.large))
         .shadow(color: Constants.Shadow.color, radius: Constants.Shadow.radius, x: Constants.Shadow.x, y: Constants.Shadow.y)
         .onAppear {
-            // Check if any Persona has liked this post
             isLiked = allPersonas.contains { persona in
                 post.likedByPersonas.contains(where: { $0.id == persona.id })
             }

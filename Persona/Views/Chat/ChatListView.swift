@@ -51,7 +51,7 @@ struct ChatListView: View {
     }
 }
 
-// MARK: - Conversation Row
+// Conversation Row
 
 private struct ConversationRow: View {
     let conversation: Conversation

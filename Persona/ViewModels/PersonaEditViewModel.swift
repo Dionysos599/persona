@@ -4,7 +4,7 @@ import PhotosUI
 
 @Observable
 final class PersonaEditViewModel {
-    // MARK: - State
+    // State
     var name: String
     var selectedTraits: Set<String>
     var backstory: String
@@ -16,7 +16,7 @@ final class PersonaEditViewModel {
     var isSaving: Bool = false
     var errorMessage: String?
     
-    // MARK: - Dependencies
+    // Dependencies
     private let persona: Persona
     private let modelContext: ModelContext
     
@@ -24,7 +24,6 @@ final class PersonaEditViewModel {
         self.persona = persona
         self.modelContext = modelContext
         
-        // Initialize with current values
         self.name = persona.name
         self.selectedTraits = Set(persona.personalityTraits)
         self.backstory = persona.backstory
@@ -37,7 +36,7 @@ final class PersonaEditViewModel {
         }
     }
     
-    // MARK: - Computed Properties
+    // Computed Properties
     var isValid: Bool {
         !name.isEmpty && !selectedTraits.isEmpty && !backstory.isEmpty
     }
@@ -51,7 +50,7 @@ final class PersonaEditViewModel {
         selectedPhoto != nil
     }
     
-    // MARK: - Actions
+    // Actions
     func save() {
         isSaving = true
         errorMessage = nil
