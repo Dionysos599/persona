@@ -91,4 +91,3 @@ struct MarkdownText: View {
     }
     .padding()
 }
-
