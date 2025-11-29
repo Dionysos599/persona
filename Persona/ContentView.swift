@@ -71,6 +71,8 @@ struct ContentView: View {
             PersonaCreationView(aiService: AIService.shared)
         case .editPersona(let persona):
             PersonaEditView(persona: persona)
+        case .myPersonaDetail(let persona):
+            PersonaDetailView(persona: persona)
         case .chatList:
             ChatListView()
         case .chat(let conversation):

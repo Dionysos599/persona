@@ -9,9 +9,8 @@ struct FeedView: View {
     @Query(filter: #Predicate<Persona> { $0.isUserOwned }) private var myPersonas: [Persona]
     
     @State private var viewModel: FeedViewModel?
-    @State private var showCreatePersonaAlert = false
     
-    private var myPersona: Persona? { myPersonas.first }
+    private var anyMyPersona: Persona? { myPersonas.first }
     
     var body: some View {
         Group {
@@ -23,45 +22,9 @@ struct FeedView: View {
         }
         .navigationTitle("社交广场")
         .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                if myPersona != nil {
-                    Button {
-                        Task {
-                            await generatePost()
-                        }
-                    } label: {
-                        if viewModel?.isGeneratingPost == true {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "plus.bubble")
-                        }
-                    }
-                    .disabled(viewModel?.isGeneratingPost == true)
-                }
-            }
-        }
         .refreshable {
             // Refresh logic - in a real app would fetch from server
             try? await Task.sleep(nanoseconds: 500_000_000)
-        }
-        .alert("需要创建 Persona", isPresented: $showCreatePersonaAlert) {
-            Button("去创建") {
-                router.selectedTab = .myPersona
-            }
-            Button("取消", role: .cancel) {}
-        } message: {
-            Text("请先在「我的」页面创建你的 Persona，才能发布动态")
-        }
-        .alert("错误", isPresented: Binding(
-            get: { viewModel?.errorMessage != nil },
-            set: { if !$0 { viewModel?.errorMessage = nil } }
-        )) {
-            Button("确定") {
-                viewModel?.errorMessage = nil
-            }
-        } message: {
-            Text(viewModel?.errorMessage ?? "")
         }
         .onAppear {
             if viewModel == nil {
@@ -80,44 +43,24 @@ struct FeedView: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("创建你的 Persona 并发布第一条动态吧！")
+            Text("创建 Persona 并发布第一条动态吧！")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             
-            if myPersona != nil {
-                Button {
-                    Task {
-                        await generatePost()
-                    }
-                } label: {
-                    HStack {
-                        Image(systemName: "sparkles")
-                        Text("AI 生成动态")
-                    }
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, Constants.Spacing.xl)
-                    .padding(.vertical, Constants.Spacing.md)
-                    .background(Color.personaGradient)
-                    .clipShape(Capsule())
+            Button {
+                router.selectedTab = .myPersona
+            } label: {
+                HStack {
+                    Image(systemName: "person.crop.circle.badge.plus")
+                    Text("创建 Persona")
                 }
-                .disabled(viewModel?.isGeneratingPost == true)
-            } else {
-                Button {
-                    router.selectedTab = .myPersona
-                } label: {
-                    HStack {
-                        Image(systemName: "person.crop.circle.badge.plus")
-                        Text("创建 Persona")
-                    }
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, Constants.Spacing.xl)
-                    .padding(.vertical, Constants.Spacing.md)
-                    .background(Color.personaGradient)
-                    .clipShape(Capsule())
-                }
+                .font(.headline)
+                .foregroundStyle(.white)
+                .padding(.horizontal, Constants.Spacing.xl)
+                .padding(.vertical, Constants.Spacing.md)
+                .background(Color.personaGradient)
+                .clipShape(Capsule())
             }
         }
         .padding()
@@ -129,7 +72,7 @@ struct FeedView: View {
                 ForEach(posts) { post in
                     PostCardView(
                         post: post,
-                        myPersona: myPersona,
+                        myPersonas: myPersonas,
                         onLike: {
                             handleLike(post)
                         },
@@ -148,17 +91,10 @@ struct FeedView: View {
         }
     }
     
-    private func generatePost() async {
-        guard let persona = myPersona else {
-            showCreatePersonaAlert = true
-            return
-        }
-        await viewModel?.generatePost(for: persona)
-    }
-    
     private func handleLike(_ post: Post) {
-        guard let persona = myPersona else {
-            showCreatePersonaAlert = true
+        // Use the first user Persona for liking (or could show a picker in the future)
+        guard let persona = anyMyPersona else {
+            // No user Persona, can't like
             return
         }
         

@@ -11,7 +11,7 @@ struct PersonaProfileView: View {
     
     @State private var isFollowing: Bool = false
     
-    private var myPersona: Persona? { myPersonas.first }
+    private var anyMyPersona: Persona? { myPersonas.first }
     private var isOwnProfile: Bool { persona.isUserOwned }
     
     private var personaPosts: [Post] {
@@ -45,7 +45,8 @@ struct PersonaProfileView: View {
         .navigationTitle(persona.name)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if let myPersona = myPersona {
+            // Check if any of user's Personas is following this persona
+            if let myPersona = anyMyPersona {
                 isFollowing = myPersona.following.contains(where: { $0.id == persona.id })
             }
         }
@@ -182,7 +183,8 @@ struct PersonaProfileView: View {
     }
     
     private func toggleFollow() {
-        guard let myPersona = myPersona else { return }
+        // Use the first user Persona for following (or could show a picker in the future)
+        guard let myPersona = anyMyPersona else { return }
         
         if isFollowing {
             // Unfollow

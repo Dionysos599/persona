@@ -3,7 +3,7 @@ import SwiftData
 
 struct PostCardView: View {
     let post: Post
-    let myPersona: Persona?
+    let myPersonas: [Persona]
     let onLike: () -> Void
     let onAuthorTap: () -> Void
     
@@ -78,9 +78,9 @@ struct PostCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: Constants.CornerRadius.large))
         .shadow(color: Constants.Shadow.color, radius: Constants.Shadow.radius, x: Constants.Shadow.x, y: Constants.Shadow.y)
         .onAppear {
-            // Check if current user has liked this post
-            if let myPersona = myPersona {
-                isLiked = post.likedByPersonas.contains(where: { $0.id == myPersona.id })
+            // Check if any of user's Personas has liked this post
+            isLiked = myPersonas.contains { persona in
+                post.likedByPersonas.contains(where: { $0.id == persona.id })
             }
         }
     }
@@ -89,7 +89,7 @@ struct PostCardView: View {
 #Preview {
     PostCardView(
         post: Post(content: "This is a sample post content that demonstrates what a post looks like in the feed."),
-        myPersona: nil,
+        myPersonas: [],
         onLike: {},
         onAuthorTap: {}
     )

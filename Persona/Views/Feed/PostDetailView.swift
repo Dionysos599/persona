@@ -11,7 +11,7 @@ struct PostDetailView: View {
     @State private var isLiked: Bool = false
     @State private var animateLike: Bool = false
     
-    private var myPersona: Persona? { myPersonas.first }
+    private var anyMyPersona: Persona? { myPersonas.first }
     
     var body: some View {
         ScrollView {
@@ -107,14 +107,16 @@ struct PostDetailView: View {
         .navigationTitle("动态详情")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if let myPersona = myPersona {
-                isLiked = post.likedByPersonas.contains(where: { $0.id == myPersona.id })
+            // Check if any of user's Personas has liked this post
+            isLiked = myPersonas.contains { persona in
+                post.likedByPersonas.contains(where: { $0.id == persona.id })
             }
         }
     }
     
     private func handleLike() {
-        guard let persona = myPersona else { return }
+        // Use the first user Persona for liking (or could show a picker in the future)
+        guard let persona = anyMyPersona else { return }
         
         if post.likedByPersonas.contains(where: { $0.id == persona.id }) {
             if let index = post.likedByPersonas.firstIndex(where: { $0.id == persona.id }) {
