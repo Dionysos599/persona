@@ -8,6 +8,7 @@ final class ChatViewModel {
     var isStreaming: Bool = false
     var currentStreamingText: String = ""
     var errorMessage: String?
+    var isAPIKeyError: Bool = false
     
     private let conversation: Conversation
     private let persona: Persona
@@ -56,7 +57,13 @@ final class ChatViewModel {
             try? modelContext.save()
             
         } catch {
-            errorMessage = error.localizedDescription
+            if let aiError = error as? AIError, aiError == .noAPIKey {
+                isAPIKeyError = true
+                errorMessage = "请先设置 API Key 才能使用 AI 功能"
+            } else {
+                isAPIKeyError = false
+                errorMessage = error.localizedDescription
+            }
         }
         
         isStreaming = false

@@ -15,6 +15,7 @@ final class PersonaCreationViewModel {
     
     var isGenerating: Bool = false
     var errorMessage: String?
+    var isAPIKeyError: Bool = false
     
     // MARK: - Dependencies
     private let aiService: AIService
@@ -54,7 +55,13 @@ final class PersonaCreationViewModel {
                 voiceStyle = .casual
             }
         } catch {
-            errorMessage = error.localizedDescription
+            if let aiError = error as? AIError, aiError == .noAPIKey {
+                isAPIKeyError = true
+                errorMessage = "请先设置 API Key 才能使用 AI 功能"
+            } else {
+                isAPIKeyError = false
+                errorMessage = error.localizedDescription
+            }
         }
         
         isGenerating = false
@@ -87,6 +94,7 @@ final class PersonaCreationViewModel {
         avatarImage = nil
         selectedPhoto = nil
         errorMessage = nil
+        isAPIKeyError = false
     }
     
     @MainActor

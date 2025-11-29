@@ -13,6 +13,8 @@ final class Router {
         case feed, chat, myPersona, settings
     }
     
+    var settingsPath = NavigationPath()
+    
     func navigate(to route: AppRoute) {
         switch selectedTab {
         case .feed:
@@ -21,8 +23,8 @@ final class Router {
             chatPath.append(route)
         case .myPersona:
             profilePath.append(route)
-        default:
-            break
+        case .settings:
+            settingsPath.append(route)
         }
     }
     
@@ -47,8 +49,8 @@ final class Router {
             chatPath = NavigationPath()
         case .myPersona:
             profilePath = NavigationPath()
-        default:
-            break
+        case .settings:
+            settingsPath = NavigationPath()
         }
     }
 }

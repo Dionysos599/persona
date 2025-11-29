@@ -87,8 +87,8 @@ struct PersonaDetailView: View {
                         .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Constants.Spacing.md)
-                        .background(Color.personaPrimary)
-                        .foregroundStyle(.white)
+                        .background(Color.secondaryBackground)
+                        .foregroundStyle(.primary)
                         .cornerRadius(Constants.CornerRadius.medium)
                     }
                     
@@ -127,7 +127,7 @@ struct PersonaDetailView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Constants.Spacing.md)
-                    .background(Color.personaGradient)
+                    .background(Color.personaPrimary)
                     .cornerRadius(Constants.CornerRadius.medium)
                 }
                 .disabled(viewModel?.isGeneratingPost == true)
@@ -159,10 +159,22 @@ struct PersonaDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .alert("错误", isPresented: Binding(
             get: { viewModel?.errorMessage != nil },
-            set: { if !$0 { viewModel?.errorMessage = nil } }
+            set: { if !$0 { 
+                viewModel?.errorMessage = nil
+                viewModel?.isAPIKeyError = false
+            } }
         )) {
             Button("确定") {
                 viewModel?.errorMessage = nil
+                viewModel?.isAPIKeyError = false
+            }
+            if viewModel?.isAPIKeyError == true {
+                Button("前往添加") {
+                    viewModel?.errorMessage = nil
+                    viewModel?.isAPIKeyError = false
+                    router.selectedTab = .settings
+                    router.navigate(to: .apiSettings)
+                }
             }
         } message: {
             Text(viewModel?.errorMessage ?? "")

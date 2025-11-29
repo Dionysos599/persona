@@ -50,17 +50,17 @@ struct MyPersonaView: View {
                 showCreateSheet = true
             } label: {
                 HStack {
-                    Image(systemName: "sparkles")
+                    Image(systemName: "person.crop.circle.badge.plus")
                     Text("开始创建")
                 }
-                .font(.headline)
-                .foregroundStyle(.white)
-                .padding(.horizontal, Constants.Spacing.xl)
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, Constants.Spacing.md)
-                .background(Color.personaGradient)
-                .clipShape(Capsule())
+                .background(Color.secondaryBackground)
+                .cornerRadius(Constants.CornerRadius.large)
             }
+            .buttonStyle(.plain)
             .padding(.top, Constants.Spacing.md)
+            .padding(.horizontal, Constants.Spacing.md)
         }
         .padding()
     }

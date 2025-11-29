@@ -5,6 +5,7 @@ import PhotosUI
 struct PersonaCreationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(Router.self) private var router
     
     private let aiService: AIService
     @State private var viewModel: PersonaCreationViewModel?
@@ -130,11 +131,24 @@ struct PersonaCreationView: View {
                     } label: {
                         HStack {
                             Image(systemName: "sparkles")
-                            Text("AI 一键生成")
+                            Text("AI一键填充性格")
                         }
                         .frame(maxWidth: .infinity)
                     }
                     .disabled(viewModel.isGenerating)
+                    
+                    Button {
+                        let persona = viewModel.createPersona()
+                        try? modelContext.save()
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("创建")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .disabled(!viewModel.isValid)
                 }
                 }
                 .navigationTitle("创建 Persona")
@@ -164,10 +178,27 @@ struct PersonaCreationView: View {
                 }
                 .alert("错误", isPresented: Binding(
                     get: { viewModel.errorMessage != nil },
-                    set: { if !$0 { viewModel.errorMessage = nil } }
+                    set: { if !$0 { 
+                        viewModel.errorMessage = nil
+                        viewModel.isAPIKeyError = false
+                    } }
                 )) {
                     Button("确定") {
                         viewModel.errorMessage = nil
+                        viewModel.isAPIKeyError = false
+                    }
+                    if viewModel.isAPIKeyError {
+                        Button("前往添加") {
+                            viewModel.errorMessage = nil
+                            viewModel.isAPIKeyError = false
+                            // Dismiss current view first, then navigate
+                            dismiss()
+                            // Use async dispatch to ensure dismiss completes before navigation
+                            DispatchQueue.main.async {
+                                router.selectedTab = .settings
+                                router.navigate(to: .apiSettings)
+                            }
+                        }
                     }
                 } message: {
                     Text(viewModel.errorMessage ?? "")

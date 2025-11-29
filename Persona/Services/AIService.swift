@@ -68,7 +68,7 @@ private struct GeneratedPersonaJSON: Decodable {
 
 // MARK: - Errors
 
-enum AIError: LocalizedError {
+enum AIError: LocalizedError, Equatable {
     case invalidResponse
     case httpError(statusCode: Int)
     case noAPIKey
@@ -182,9 +182,9 @@ actor AIService {
         }
         
         let prompt = """
-        Based on your personality and interests, write a social media post.
-        Keep it authentic to your character. The post should be 1-3 sentences.
-        Only output the post content, nothing else.
+        根据你的性格特征和兴趣爱好，写一条社交媒体动态。
+        请保持你的角色设定，内容要真实自然。动态长度应为 1-3 句话。
+        只输出动态内容，不要输出其他内容。
         """
         
         let messages = [
@@ -208,18 +208,18 @@ actor AIService {
         }
         
         let prompt = """
-        Create a unique AI persona with the following JSON format:
+        创建一个独特的 AI 人格，使用以下 JSON 格式：
         {
-            "name": "A creative name",
-            "traits": ["trait1", "trait2", "trait3"],
-            "backstory": "A brief but interesting backstory (2-3 sentences)",
-            "interests": ["interest1", "interest2", "interest3"]
+            "name": "一个富有创意的名字",
+            "traits": ["特征1", "特征2", "特征3"],
+            "backstory": "一段简短但有趣的背景故事（2-3 句话）",
+            "interests": ["兴趣1", "兴趣2", "兴趣3"]
         }
-        Only output valid JSON, nothing else.
+        只输出有效的 JSON，不要输出其他内容。
         """
         
         let messages = [
-            APIMessage(role: "system", content: "You are a creative assistant that generates unique AI personas."),
+            APIMessage(role: "system", content: "你是一个创意助手，专门生成独特的 AI 人格。"),
             APIMessage(role: "user", content: prompt)
         ]
         

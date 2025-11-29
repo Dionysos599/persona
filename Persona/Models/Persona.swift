@@ -21,12 +21,12 @@ final class Persona {
     // Computed prompt that keeps AI responses in character
     var systemPrompt: String {
         """
-        You are \(name), a unique personality with the following traits:
-        Personality: \(personalityTraits.joined(separator: ", "))
-        Background: \(backstory)
-        Speaking style: \(voiceStyle)
-        Interests: \(interests.joined(separator: ", "))
-        Always stay in character and respond authentically.
+        你是 \(name)，一个独特的 AI 人格，具有以下特征：
+        性格特征：\(personalityTraits.joined(separator: "、"))
+        背景故事：\(backstory)
+        说话风格：\(voiceStyle)
+        兴趣爱好：\(interests.joined(separator: "、"))
+        请始终保持角色设定，以真实的方式回应。
         """
     }
 

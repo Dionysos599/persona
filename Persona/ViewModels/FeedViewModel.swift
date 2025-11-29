@@ -6,6 +6,7 @@ final class FeedViewModel {
     var isLoading: Bool = false
     var isGeneratingPost: Bool = false
     var errorMessage: String?
+    var isAPIKeyError: Bool = false
     
     private let aiService: AIService
     private let modelContext: ModelContext
@@ -27,7 +28,13 @@ final class FeedViewModel {
             persona.posts.append(post)
             try? modelContext.save()
         } catch {
-            errorMessage = error.localizedDescription
+            if let aiError = error as? AIError, aiError == .noAPIKey {
+                isAPIKeyError = true
+                errorMessage = "请先设置 API Key 才能使用 AI 功能"
+            } else {
+                isAPIKeyError = false
+                errorMessage = error.localizedDescription
+            }
         }
         
         isGeneratingPost = false

@@ -8,6 +8,7 @@ struct APISettingsView: View {
     @State private var showAPIKey: Bool = false
     @State private var showSaveAlert: Bool = false
     @State private var errorMessage: String?
+    @State private var isBaseURLManuallyEdited: Bool = false
     
     var body: some View {
         Form {
@@ -51,23 +52,80 @@ struct APISettingsView: View {
                     .textContentType(.URL)
                     .autocapitalization(.none)
                     .autocorrectionDisabled()
+                    .onChange(of: apiBaseURL) { oldValue, newValue in
+                        // Track if user manually edited the Base URL
+                        if let modelBaseURL = Constants.API.baseURL(for: apiModel),
+                           newValue != modelBaseURL {
+                            isBaseURLManuallyEdited = true
+                        }
+                    }
+                
+                if isBaseURLManuallyEdited {
+                    Button {
+                        // Reset to model's default Base URL
+                        if let modelBaseURL = Constants.API.baseURL(for: apiModel) {
+                            apiBaseURL = modelBaseURL
+                            isBaseURLManuallyEdited = false
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise")
+                            Text("重置为模型默认 URL")
+                        }
+                        .font(.subheadline)
+                    }
+                }
             } header: {
                 Text("API Base URL")
             } footer: {
-                Text("默认: \(Constants.API.defaultBaseURL)\n支持 OpenAI 兼容的 API 服务")
+                if let modelBaseURL = Constants.API.baseURL(for: apiModel), !isBaseURLManuallyEdited {
+                    Text("当前模型默认: \(modelBaseURL)\n支持 OpenAI 兼容的 API 服务")
+                } else {
+                    Text("默认: \(Constants.API.defaultBaseURL)\n支持 OpenAI 兼容的 API 服务\n\n常用服务 Base URL：\n• Qwen: https://dashscope.aliyuncs.com/compatible-mode/v1\n• DeepSeek: https://api.deepseek.com/v1\n• Doubao: https://ark.cn-beijing.volces.com/api/v3")
+                }
             }
             
             Section {
                 Picker("模型", selection: $apiModel) {
-                    Text("GPT-4o").tag("gpt-4o")
-                    Text("GPT-4 Turbo").tag("gpt-4-turbo")
-                    Text("GPT-3.5 Turbo").tag("gpt-3.5-turbo")
-                    Text("Claude 3.5 Sonnet").tag("claude-3-5-sonnet-20241022")
+                    Group {
+                        Text("GPT-4o").tag("gpt-4o")
+                        Text("GPT-4 Turbo").tag("gpt-4-turbo")
+                        Text("GPT-3.5 Turbo").tag("gpt-3.5-turbo")
+                        Text("Claude 3.5 Sonnet").tag("claude-3-5-sonnet-20241022")
+                    }
+                    
+                    Divider()
+                    
+                    Group {
+                        Text("Qwen Turbo").tag("qwen-turbo")
+                        Text("Qwen Plus").tag("qwen-plus")
+                        Text("Qwen Max").tag("qwen-max")
+                    }
+                    
+                    Divider()
+                    
+                    Group {
+                        Text("DeepSeek Chat").tag("deepseek-chat")
+                        Text("DeepSeek Coder").tag("deepseek-coder")
+                    }
+                    
+                    Divider()
+                    
+                    Group {
+                        Text("Doubao Pro").tag("doubao-pro")
+                        Text("Doubao Lite").tag("doubao-lite")
+                    }
+                }
+                .onChange(of: apiModel) { oldValue, newValue in
+                    // Auto-update Base URL when model changes (only if not manually edited)
+                    if !isBaseURLManuallyEdited, let modelBaseURL = Constants.API.baseURL(for: newValue) {
+                        apiBaseURL = modelBaseURL
+                    }
                 }
             } header: {
                 Text("模型选择")
             } footer: {
-                Text("选择要使用的 AI 模型。不同模型的价格和性能不同")
+                Text("选择要使用的 AI 模型。不同模型的价格和性能不同。选择模型后会自动更新对应的 API Base URL")
             }
             
             Section {
@@ -108,6 +166,20 @@ struct APISettingsView: View {
     
     private func loadSettings() {
         // Settings are automatically loaded from AppStorage
+        // If Base URL is empty or default, try to set it based on current model
+        if apiBaseURL.isEmpty || apiBaseURL == Constants.API.defaultBaseURL {
+            if let modelBaseURL = Constants.API.baseURL(for: apiModel) {
+                apiBaseURL = modelBaseURL
+                isBaseURLManuallyEdited = false
+            }
+        } else {
+            // Check if current Base URL matches model's default
+            if let modelBaseURL = Constants.API.baseURL(for: apiModel),
+               apiBaseURL != modelBaseURL {
+                isBaseURLManuallyEdited = true
+            }
+        }
+        
         // Configure AIService with current settings
         Task {
             await configureAIService()

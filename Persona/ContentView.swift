@@ -44,7 +44,7 @@ struct ContentView: View {
             .tag(Router.Tab.myPersona)
             
             // Settings Tab
-            NavigationStack {
+            NavigationStack(path: $router.settingsPath) {
                 SettingsView()
                     .navigationDestination(for: AppRoute.self) { route in
                         destinationView(for: route)
@@ -56,6 +56,12 @@ struct ContentView: View {
             .tag(Router.Tab.settings)
         }
         .environment(router)
+        .onChange(of: router.selectedTab) { oldValue, newValue in
+            // Reset navigation path when switching to "我的" tab
+            if newValue == .myPersona {
+                router.profilePath = NavigationPath()
+            }
+        }
     }
     
     @ViewBuilder

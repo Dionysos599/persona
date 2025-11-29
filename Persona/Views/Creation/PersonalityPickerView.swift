@@ -9,7 +9,7 @@ struct PersonalityPickerView: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: Constants.Spacing.sm) {
             ForEach(availableTraits, id: \.self) { trait in
                 TraitChip(
-                    title: trait.rawValue.capitalized,
+                    title: trait.displayName,
                     isSelected: selectedTraits.contains(trait.rawValue)
                 ) {
                     if selectedTraits.contains(trait.rawValue) {

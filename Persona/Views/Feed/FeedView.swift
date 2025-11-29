@@ -52,16 +52,15 @@ struct FeedView: View {
                 router.selectedTab = .myPersona
             } label: {
                 HStack {
-                    Image(systemName: "person.crop.circle.badge.plus")
-                    Text("创建 Persona")
+                    Text("我的 Persona")
                 }
-                .font(.headline)
-                .foregroundStyle(.white)
-                .padding(.horizontal, Constants.Spacing.xl)
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, Constants.Spacing.md)
-                .background(Color.personaGradient)
-                .clipShape(Capsule())
+                .background(Color.secondaryBackground)
+                .cornerRadius(Constants.CornerRadius.large)
             }
+            .buttonStyle(.plain)
+            .padding(.horizontal, Constants.Spacing.md)
         }
         .padding()
     }

@@ -27,4 +27,17 @@ enum PersonalityTrait: String, Codable, CaseIterable {
     case witty
     case calm
     case energetic
+    
+    var displayName: String {
+        switch self {
+        case .creative: return "创意"
+        case .analytical: return "分析"
+        case .empathetic: return "共情"
+        case .adventurous: return "冒险"
+        case .philosophical: return "哲学"
+        case .witty: return "机智"
+        case .calm: return "冷静"
+        case .energetic: return "活力"
+        }
+    }
 }

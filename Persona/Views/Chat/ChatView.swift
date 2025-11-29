@@ -5,6 +5,7 @@ struct ChatView: View {
     let conversation: Conversation
     
     @Environment(\.modelContext) private var modelContext
+    @Environment(Router.self) private var router
     @State private var viewModel: ChatViewModel?
     @FocusState private var isInputFocused: Bool
     
@@ -76,10 +77,22 @@ struct ChatView: View {
         .navigationBarTitleDisplayMode(.inline)
         .alert("错误", isPresented: Binding(
             get: { viewModel?.errorMessage != nil },
-            set: { if !$0 { viewModel?.errorMessage = nil } }
+            set: { if !$0 { 
+                viewModel?.errorMessage = nil
+                viewModel?.isAPIKeyError = false
+            } }
         )) {
             Button("确定") {
                 viewModel?.errorMessage = nil
+                viewModel?.isAPIKeyError = false
+            }
+            if viewModel?.isAPIKeyError == true {
+                Button("前往添加") {
+                    viewModel?.errorMessage = nil
+                    viewModel?.isAPIKeyError = false
+                    router.selectedTab = .settings
+                    router.navigate(to: .apiSettings)
+                }
             }
         } message: {
             Text(viewModel?.errorMessage ?? "")
