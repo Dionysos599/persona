@@ -90,7 +90,7 @@ struct ChatView: View {
                 Button("前往添加") {
                     viewModel?.errorMessage = nil
                     viewModel?.isAPIKeyError = false
-                    router.selectedTab = .settings
+                    router.selectedTab = .myProfile
                     router.navigate(to: .apiSettings)
                 }
             }

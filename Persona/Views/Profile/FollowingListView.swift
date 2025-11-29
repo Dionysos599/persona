@@ -1,75 +1,51 @@
 import SwiftUI
 import SwiftData
 
-struct MyPersonaView: View {
+struct FollowingListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<Persona> { $0.isUserOwned }, sort: \Persona.createdAt, order: .reverse) private var myPersonas: [Persona]
-    @State private var showCreateSheet = false
+    @Query(filter: #Predicate<Persona> { $0.isUserOwned }) private var myPersonas: [Persona]
+    
+    private var followingPersonas: [Persona] {
+        guard let myPersona = myPersonas.first else { return [] }
+        return myPersona.following
+    }
     
     var body: some View {
         Group {
-            if myPersonas.isEmpty {
+            if followingPersonas.isEmpty {
                 emptyStateView
             } else {
-                personaListView
+                followingListView
             }
         }
-        .navigationTitle("Persona")
+        .navigationTitle("关注列表")
         .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showCreateSheet = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $showCreateSheet) {
-            PersonaCreationView(aiService: AIService.shared)
-        }
     }
     
     private var emptyStateView: some View {
         VStack(spacing: Constants.Spacing.lg) {
-            Image(systemName: "person.crop.circle.badge.plus")
+            Image(systemName: "person.2")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
             
-            Text("创建你的 Persona")
+            Text("还没有关注任何人")
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Persona 是你的 AI 化身，可以代表你发布动态、与其他 Persona 互动")
+            Text("在广场中发现有趣的 Persona 并关注他们吧！")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Constants.Spacing.xl)
-            
-            Button {
-                showCreateSheet = true
-            } label: {
-                HStack {
-                    Image(systemName: "person.crop.circle.badge.plus")
-                    Text("开始创建")
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Constants.Spacing.md)
-                .background(Color.secondaryBackground)
-                .cornerRadius(Constants.CornerRadius.large)
-            }
-            .buttonStyle(.plain)
-            .padding(.top, Constants.Spacing.md)
-            .padding(.horizontal, Constants.Spacing.md)
         }
         .padding()
     }
     
-    private var personaListView: some View {
+    private var followingListView: some View {
         List {
-            ForEach(myPersonas) { persona in
-                NavigationLink(value: AppRoute.myPersonaDetail(persona)) {
-                    PersonaListRow(persona: persona)
+            ForEach(followingPersonas) { persona in
+                NavigationLink(value: AppRoute.personaProfile(persona)) {
+                    FollowingListRow(persona: persona)
                 }
             }
         }
@@ -77,9 +53,9 @@ struct MyPersonaView: View {
     }
 }
 
-// MARK: - Persona List Row
+// MARK: - Following List Row
 
-private struct PersonaListRow: View {
+private struct FollowingListRow: View {
     let persona: Persona
     @Query(sort: \Post.createdAt, order: .reverse) private var allPosts: [Post]
     
@@ -132,7 +108,7 @@ private struct PersonaListRow: View {
 
 #Preview {
     NavigationStack {
-        MyPersonaView()
+        FollowingListView()
     }
     .modelContainer(for: [Persona.self, Post.self, Conversation.self, Message.self])
 }

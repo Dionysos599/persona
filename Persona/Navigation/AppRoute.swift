@@ -7,10 +7,10 @@ enum AppRoute: Hashable {
     case postDetail(Post)
     
     // Persona routes
-    case personaProfile(Persona)
+    case personaProfile(Persona)  // Profile view for any Persona (merged with myPersonaDetail)
     case createPersona
     case editPersona(Persona)
-    case myPersonaDetail(Persona)  // Detail view for user's own Persona
+    case myPersonaDetail(Persona)  // Detail view for user's own Persona (also uses PersonaDetailView)
     
     // Chat routes
     case chatList
@@ -20,5 +20,6 @@ enum AppRoute: Hashable {
     // Settings
     case settings
     case apiSettings
+    case followingList  // List of followed Personas
 }
 

@@ -195,7 +195,7 @@ struct PersonaCreationView: View {
                             dismiss()
                             // Use async dispatch to ensure dismiss completes before navigation
                             DispatchQueue.main.async {
-                                router.selectedTab = .settings
+                                router.selectedTab = .myProfile
                                 router.navigate(to: .apiSettings)
                             }
                         }

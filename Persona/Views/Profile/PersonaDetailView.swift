@@ -8,10 +8,16 @@ struct PersonaDetailView: View {
     @Environment(Router.self) private var router
     
     @Query(sort: \Post.createdAt, order: .reverse) private var allPosts: [Post]
-    @State private var viewModel: FeedViewModel?
-    @State private var showGeneratePostAlert = false
+    @Query(filter: #Predicate<Persona> { $0.isUserOwned }) private var myPersonas: [Persona]
     
-    private var myPosts: [Post] {
+    @State private var viewModel: FeedViewModel?
+    @State private var isFollowing: Bool = false
+    @State private var showUnfollowConfirmation: Bool = false
+    
+    private var anyMyPersona: Persona? { myPersonas.first }
+    private var isOwnProfile: Bool { persona.isUserOwned }
+    
+    private var personaPosts: [Post] {
         allPosts.filter { $0.author?.id == persona.id }
     }
     
@@ -19,144 +25,39 @@ struct PersonaDetailView: View {
         ScrollView {
             VStack(spacing: Constants.Spacing.lg) {
                 // Avatar and name
-                VStack(spacing: Constants.Spacing.md) {
-                    if let imageData = persona.avatarImageData,
-                       let uiImage = UIImage(data: imageData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: Constants.AvatarSize.xLarge, height: Constants.AvatarSize.xLarge)
-                            .clipShape(Circle())
-                            .overlay {
-                                Circle()
-                                    .stroke(Color.personaGradient, lineWidth: 3)
-                            }
-                    } else {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: Constants.AvatarSize.xLarge, height: Constants.AvatarSize.xLarge)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    Text(persona.name)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    // Traits
-                    if !persona.personalityTraits.isEmpty {
-                        HStack(spacing: Constants.Spacing.xs) {
-                            ForEach(persona.personalityTraits.prefix(3), id: \.self) { trait in
-                                Text(trait.capitalized)
-                                    .font(.caption)
-                                    .padding(.horizontal, Constants.Spacing.sm)
-                                    .padding(.vertical, Constants.Spacing.xs)
-                                    .background(Color.secondaryBackground)
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
+                profileHeader
+                
+                // Action buttons
+                if isOwnProfile {
+                    // Own Persona: show management actions + follow button
+                    ownProfileActions
+                } else {
+                    // Other Persona: show follow button only
+                    followButton
                 }
-                .padding(.top, Constants.Spacing.md)
                 
                 // Backstory
                 if !persona.backstory.isEmpty {
-                    VStack(alignment: .leading, spacing: Constants.Spacing.sm) {
-                        Text("背景故事")
-                            .font(.headline)
-                        Text(persona.backstory)
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Color.secondaryBackground)
-                    .cornerRadius(Constants.CornerRadius.medium)
-                    .padding(.horizontal)
+                    backstorySection
                 }
                 
-                // Action buttons
-                HStack(spacing: Constants.Spacing.md) {
-                    Button {
-                        router.navigate(to: .privateChat(persona))
-                    } label: {
-                        HStack {
-                            Image(systemName: "bubble.left.and.bubble.right")
-                            Text("私密对话")
-                        }
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Constants.Spacing.md)
-                        .background(Color.secondaryBackground)
-                        .foregroundStyle(.primary)
-                        .cornerRadius(Constants.CornerRadius.medium)
-                    }
-                    
-                    NavigationLink(value: AppRoute.editPersona(persona)) {
-                        HStack {
-                            Image(systemName: "pencil")
-                            Text("编辑")
-                        }
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Constants.Spacing.md)
-                        .background(Color.secondaryBackground)
-                        .foregroundStyle(.primary)
-                        .cornerRadius(Constants.CornerRadius.medium)
-                    }
-                }
-                .padding(.horizontal)
-                
-                // Generate Post button
-                Button {
-                    Task {
-                        await generatePost()
-                    }
-                } label: {
-                    HStack {
-                        if viewModel?.isGeneratingPost == true {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Image(systemName: "sparkles")
-                        }
-                        Text(viewModel?.isGeneratingPost == true ? "生成中..." : "AI 生成动态")
-                    }
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, Constants.Spacing.md)
-                    .background(Color.personaPrimary)
-                    .cornerRadius(Constants.CornerRadius.medium)
-                }
-                .disabled(viewModel?.isGeneratingPost == true)
-                .padding(.horizontal)
-                
-                // My posts section
-                VStack(alignment: .leading, spacing: Constants.Spacing.md) {
-                    Text("我的动态")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    
-                    if myPosts.isEmpty {
-                        Text("还没有发布任何动态")
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                    } else {
-                        ForEach(myPosts.prefix(5)) { post in
-                            PersonaPostCard(post: post)
-                                .onTapGesture {
-                                    router.navigate(to: .postDetail(post))
-                                }
-                        }
-                    }
-                }
+                // Posts section
+                postsSection
             }
         }
         .navigationTitle(persona.name)
         .navigationBarTitleDisplayMode(.inline)
+        .alert("取消关注", isPresented: $showUnfollowConfirmation) {
+            Button("取消", role: .cancel) {
+                showUnfollowConfirmation = false
+            }
+            Button("确认", role: .destructive) {
+                toggleFollow()
+                showUnfollowConfirmation = false
+            }
+        } message: {
+            Text("确定要取消关注 \(persona.name) 吗？")
+        }
         .alert("错误", isPresented: Binding(
             get: { viewModel?.errorMessage != nil },
             set: { if !$0 { 
@@ -172,7 +73,7 @@ struct PersonaDetailView: View {
                 Button("前往添加") {
                     viewModel?.errorMessage = nil
                     viewModel?.isAPIKeyError = false
-                    router.selectedTab = .settings
+                    router.selectedTab = .myProfile
                     router.navigate(to: .apiSettings)
                 }
             }
@@ -180,14 +81,226 @@ struct PersonaDetailView: View {
             Text(viewModel?.errorMessage ?? "")
         }
         .onAppear {
-            if viewModel == nil {
+            if viewModel == nil && isOwnProfile {
                 viewModel = FeedViewModel(aiService: AIService.shared, modelContext: modelContext)
+            }
+            // Check if any of user's Personas is following this persona
+            if let myPersona = anyMyPersona {
+                isFollowing = myPersona.following.contains(where: { $0.id == persona.id })
             }
         }
     }
     
+    // MARK: - Profile Header
+    
+    private var profileHeader: some View {
+        VStack(spacing: Constants.Spacing.md) {
+            PersonaAvatarView(persona: persona, size: Constants.AvatarSize.xLarge)
+            
+            Text(persona.name)
+                .font(.title)
+                .fontWeight(.bold)
+            
+            // Traits
+            if !persona.personalityTraits.isEmpty {
+                HStack(spacing: Constants.Spacing.xs) {
+                    ForEach(persona.personalityTraits.prefix(4), id: \.self) { traitString in
+                        if let trait = PersonalityTrait.allCases.first(where: { $0.rawValue == traitString }) {
+                            Text(trait.displayName)
+                                .font(.caption)
+                                .padding(.horizontal, Constants.Spacing.sm)
+                                .padding(.vertical, Constants.Spacing.xs)
+                                .background(Color.secondaryBackground)
+                                .clipShape(Capsule())
+                        } else {
+                            Text(traitString.capitalized)
+                                .font(.caption)
+                                .padding(.horizontal, Constants.Spacing.sm)
+                                .padding(.vertical, Constants.Spacing.xs)
+                                .background(Color.secondaryBackground)
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+            
+            // Interests
+            if !persona.interests.isEmpty {
+                HStack(spacing: Constants.Spacing.xs) {
+                    ForEach(persona.interests.prefix(3), id: \.self) { interest in
+                        Text("#\(interest)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(.top, Constants.Spacing.md)
+    }
+    
+    // MARK: - Own Profile Actions
+    
+    private var ownProfileActions: some View {
+        VStack(spacing: Constants.Spacing.md) {
+            // Follow button (first)
+            followButton
+            
+            // AI Generate Post button (second)
+            Button {
+                Task {
+                    await generatePost()
+                }
+            } label: {
+                HStack {
+                    if viewModel?.isGeneratingPost == true {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "sparkles")
+                    }
+                    Text(viewModel?.isGeneratingPost == true ? "生成中..." : "AI 生成动态")
+                }
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Constants.Spacing.md)
+                .background(Color.personaPrimary)
+                .cornerRadius(Constants.CornerRadius.medium)
+            }
+            .disabled(viewModel?.isGeneratingPost == true)
+            .padding(.horizontal)
+            
+            // Management buttons (third row)
+            HStack(spacing: Constants.Spacing.md) {
+                Button {
+                    router.navigate(to: .privateChat(persona))
+                } label: {
+                    HStack {
+                        Image(systemName: "bubble.left.and.bubble.right")
+                        Text("私密对话")
+                    }
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Constants.Spacing.md)
+                    .background(Color.personaPrimary)
+                    .foregroundStyle(.white)
+                    .cornerRadius(Constants.CornerRadius.medium)
+                }
+                
+                NavigationLink(value: AppRoute.editPersona(persona)) {
+                    HStack {
+                        Image(systemName: "pencil")
+                        Text("编辑")
+                    }
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Constants.Spacing.md)
+                    .background(Color.secondaryBackground)
+                    .foregroundStyle(.primary)
+                    .cornerRadius(Constants.CornerRadius.medium)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+    
+    // MARK: - Follow Button
+    
+    private var followButton: some View {
+        Button {
+            if isFollowing {
+                showUnfollowConfirmation = true
+            } else {
+                toggleFollow()
+            }
+        } label: {
+            HStack {
+                Image(systemName: isFollowing ? "person.badge.checkmark" : "person.badge.plus")
+                Text(isFollowing ? "已关注" : "关注")
+            }
+            .font(.subheadline)
+            .fontWeight(.medium)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Constants.Spacing.md)
+            .background(isFollowing ? Color.secondaryBackground : Color.personaPrimary)
+            .foregroundStyle(isFollowing ? Color.primary : Color.white)
+            .cornerRadius(Constants.CornerRadius.medium)
+        }
+        .padding(.horizontal)
+        .disabled(anyMyPersona == nil)
+    }
+    
+    // MARK: - Backstory Section
+    
+    private var backstorySection: some View {
+        VStack(alignment: .leading, spacing: Constants.Spacing.sm) {
+            Text("关于")
+                .font(.headline)
+            
+            Text(persona.backstory)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .lineSpacing(4)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color.secondaryBackground)
+        .cornerRadius(Constants.CornerRadius.medium)
+        .padding(.horizontal)
+    }
+    
+    // MARK: - Posts Section
+    
+    private var postsSection: some View {
+        VStack(alignment: .leading, spacing: Constants.Spacing.md) {
+            Text("动态")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            if personaPosts.isEmpty {
+                Text("还没有发布任何动态")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+            } else {
+                ForEach(personaPosts, id: \.id) { post in
+                    PersonaPostCard(post: post)
+                        .onTapGesture {
+                            router.navigate(to: .postDetail(post))
+                        }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Actions
+    
     private func generatePost() async {
         await viewModel?.generatePost(for: persona)
+    }
+    
+    private func toggleFollow() {
+        // Use the first user Persona for following (or could show a picker in the future)
+        guard let myPersona = anyMyPersona else { return }
+        
+        if isFollowing {
+            // Unfollow
+            if let index = myPersona.following.firstIndex(where: { $0.id == persona.id }) {
+                myPersona.following.remove(at: index)
+            }
+            if let index = persona.followers.firstIndex(where: { $0.id == myPersona.id }) {
+                persona.followers.remove(at: index)
+            }
+        } else {
+            // Follow
+            myPersona.following.append(persona)
+            persona.followers.append(myPersona)
+        }
+        
+        isFollowing.toggle()
+        try? modelContext.save()
     }
 }
 
@@ -200,6 +313,7 @@ private struct PersonaPostCard: View {
         VStack(alignment: .leading, spacing: Constants.Spacing.sm) {
             Text(post.content)
                 .font(.body)
+                .lineLimit(nil)
             
             HStack {
                 Text(post.createdAt.formatted(.relative(presentation: .named)))

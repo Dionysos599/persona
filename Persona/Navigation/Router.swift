@@ -10,7 +10,7 @@ final class Router {
     var selectedTab: Tab = .feed
     
     enum Tab: Hashable {
-        case feed, chat, myPersona, settings
+        case feed, chat, persona, myProfile
     }
     
     var settingsPath = NavigationPath()
@@ -21,9 +21,9 @@ final class Router {
             feedPath.append(route)
         case .chat:
             chatPath.append(route)
-        case .myPersona:
+        case .persona:
             profilePath.append(route)
-        case .settings:
+        case .myProfile:
             settingsPath.append(route)
         }
     }
@@ -34,7 +34,7 @@ final class Router {
             if !feedPath.isEmpty { feedPath.removeLast() }
         case .chat:
             if !chatPath.isEmpty { chatPath.removeLast() }
-        case .myPersona:
+        case .persona:
             if !profilePath.isEmpty { profilePath.removeLast() }
         default:
             break
@@ -47,9 +47,9 @@ final class Router {
             feedPath = NavigationPath()
         case .chat:
             chatPath = NavigationPath()
-        case .myPersona:
+        case .persona:
             profilePath = NavigationPath()
-        case .settings:
+        case .myProfile:
             settingsPath = NavigationPath()
         }
     }

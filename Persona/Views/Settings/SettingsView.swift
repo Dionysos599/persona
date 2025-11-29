@@ -5,6 +5,16 @@ struct SettingsView: View {
     
     var body: some View {
         List {
+            Section("关注") {
+                NavigationLink(value: AppRoute.followingList) {
+                    HStack {
+                        Image(systemName: "person.2.fill")
+                            .foregroundStyle(Color.personaPrimary)
+                        Text("关注列表")
+                    }
+                }
+            }
+            
             Section("AI 配置") {
                 NavigationLink(value: AppRoute.apiSettings) {
                     HStack {
@@ -37,7 +47,7 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("设置")
+        .navigationTitle("我的")
         .navigationBarTitleDisplayMode(.large)
         .navigationDestination(for: AppRoute.self) { route in
             destinationView(for: route)
@@ -47,6 +57,8 @@ struct SettingsView: View {
     @ViewBuilder
     private func destinationView(for route: AppRoute) -> some View {
         switch route {
+        case .followingList:
+            FollowingListView()
         case .apiSettings:
             APISettingsView()
         default:

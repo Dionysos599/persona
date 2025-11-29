@@ -49,7 +49,7 @@ struct FeedView: View {
                 .multilineTextAlignment(.center)
             
             Button {
-                router.selectedTab = .myPersona
+                router.selectedTab = .persona
             } label: {
                 HStack {
                     Text("我的 Persona")

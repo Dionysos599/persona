@@ -31,7 +31,7 @@ struct ContentView: View {
             }
             .tag(Router.Tab.chat)
             
-            // My Persona Tab
+            // Persona Tab
             NavigationStack(path: $router.profilePath) {
                 MyPersonaView()
                     .navigationDestination(for: AppRoute.self) { route in
@@ -39,11 +39,11 @@ struct ContentView: View {
                     }
             }
             .tabItem {
-                Label("我的", systemImage: "person.crop.circle")
+                Label("Persona", systemImage: "person.2")
             }
-            .tag(Router.Tab.myPersona)
+            .tag(Router.Tab.persona)
             
-            // Settings Tab
+            // My Profile Tab
             NavigationStack(path: $router.settingsPath) {
                 SettingsView()
                     .navigationDestination(for: AppRoute.self) { route in
@@ -51,14 +51,14 @@ struct ContentView: View {
                     }
             }
             .tabItem {
-                Label("设置", systemImage: "gearshape")
+                Label("我的", systemImage: "person.crop.circle")
             }
-            .tag(Router.Tab.settings)
+            .tag(Router.Tab.myProfile)
         }
         .environment(router)
         .onChange(of: router.selectedTab) { oldValue, newValue in
-            // Reset navigation path when switching to "我的" tab
-            if newValue == .myPersona {
+            // Reset navigation path when switching to "Persona" tab
+            if newValue == .persona {
                 router.profilePath = NavigationPath()
             }
         }
@@ -72,13 +72,13 @@ struct ContentView: View {
         case .postDetail(let post):
             PostDetailView(post: post)
         case .personaProfile(let persona):
-            PersonaProfileView(persona: persona)
+            PersonaDetailView(persona: persona)
         case .createPersona:
             PersonaCreationView(aiService: AIService.shared)
         case .editPersona(let persona):
             PersonaEditView(persona: persona)
         case .myPersonaDetail(let persona):
-            PersonaDetailView(persona: persona)
+            PersonaDetailView(persona: persona)  // Same view as personaProfile, handles both cases
         case .chatList:
             ChatListView()
         case .chat(let conversation):
@@ -89,6 +89,8 @@ struct ContentView: View {
             SettingsView()
         case .apiSettings:
             APISettingsView()
+        case .followingList:
+            FollowingListView()
         }
     }
 }
