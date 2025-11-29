@@ -3,12 +3,12 @@ import SwiftData
 
 struct MyPersonaView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<Persona> { $0.isUserOwned }, sort: \Persona.createdAt, order: .reverse) private var myPersonas: [Persona]
+    @Query(sort: \Persona.createdAt, order: .reverse) private var allPersonas: [Persona]
     @State private var showCreateSheet = false
     
     var body: some View {
         Group {
-            if myPersonas.isEmpty {
+            if allPersonas.isEmpty {
                 emptyStateView
             } else {
                 personaListView
@@ -67,7 +67,7 @@ struct MyPersonaView: View {
     
     private var personaListView: some View {
         List {
-            ForEach(myPersonas) { persona in
+            ForEach(allPersonas) { persona in
                 NavigationLink(value: AppRoute.myPersonaDetail(persona)) {
                     PersonaListRow(persona: persona)
                 }

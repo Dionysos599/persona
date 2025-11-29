@@ -61,6 +61,8 @@ struct SettingsView: View {
             FollowingListView()
         case .apiSettings:
             APISettingsView()
+        case .personaProfile(let persona):
+            PersonaDetailView(persona: persona)
         default:
             EmptyView()
         }

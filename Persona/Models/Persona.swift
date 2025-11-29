@@ -11,7 +11,6 @@ final class Persona {
     var voiceStyle: String
     var interests: [String]
     var createdAt: Date
-    var isUserOwned: Bool
 
     @Relationship(deleteRule: .cascade) var posts: [Post] = []
     @Relationship(deleteRule: .cascade) var conversations: [Conversation] = []
@@ -35,8 +34,7 @@ final class Persona {
         personalityTraits: [String],
         backstory: String,
         voiceStyle: String,
-        interests: [String],
-        isUserOwned: Bool = false
+        interests: [String]
     ) {
         self.id = UUID()
         self.name = name
@@ -45,6 +43,5 @@ final class Persona {
         self.voiceStyle = voiceStyle
         self.interests = interests
         self.createdAt = Date()
-        self.isUserOwned = isUserOwned
     }
 }

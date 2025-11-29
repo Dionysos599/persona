@@ -6,11 +6,11 @@ struct FeedView: View {
     @Environment(Router.self) private var router
     
     @Query(sort: \Post.createdAt, order: .reverse) private var posts: [Post]
-    @Query(filter: #Predicate<Persona> { $0.isUserOwned }) private var myPersonas: [Persona]
+    @Query(sort: \Persona.createdAt, order: .reverse) private var allPersonas: [Persona]
     
     @State private var viewModel: FeedViewModel?
     
-    private var anyMyPersona: Persona? { myPersonas.first }
+    private var anyPersona: Persona? { allPersonas.first }
     
     var body: some View {
         Group {
@@ -71,7 +71,7 @@ struct FeedView: View {
                 ForEach(posts) { post in
                     PostCardView(
                         post: post,
-                        myPersonas: myPersonas,
+                        allPersonas: allPersonas,
                         onLike: {
                             handleLike(post)
                         },
@@ -91,9 +91,9 @@ struct FeedView: View {
     }
     
     private func handleLike(_ post: Post) {
-        // Use the first user Persona for liking (or could show a picker in the future)
-        guard let persona = anyMyPersona else {
-            // No user Persona, can't like
+        // Use the first Persona for liking (or could show a picker in the future)
+        guard let persona = anyPersona else {
+            // No Persona, can't like
             return
         }
         

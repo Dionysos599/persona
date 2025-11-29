@@ -146,11 +146,4 @@ enum Constants {
         static let maxPostLength = 500
         static let maxMessageLength = 1000
     }
-
-    // MARK: - Mock Data (Development)
-    enum MockData {
-        static let isEnabled = true // Set to false for production
-        static let samplePersonaCount = 5
-        static let samplePostCount = 10
-    }
 }

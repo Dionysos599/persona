@@ -3,11 +3,11 @@ import SwiftData
 
 struct FollowingListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<Persona> { $0.isUserOwned }) private var myPersonas: [Persona]
+    @Query(sort: \Persona.createdAt, order: .reverse) private var allPersonas: [Persona]
     
     private var followingPersonas: [Persona] {
-        guard let myPersona = myPersonas.first else { return [] }
-        return myPersona.following
+        guard let firstPersona = allPersonas.first else { return [] }
+        return firstPersona.following
     }
     
     var body: some View {

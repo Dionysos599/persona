@@ -8,14 +8,13 @@ struct PersonaDetailView: View {
     @Environment(Router.self) private var router
     
     @Query(sort: \Post.createdAt, order: .reverse) private var allPosts: [Post]
-    @Query(filter: #Predicate<Persona> { $0.isUserOwned }) private var myPersonas: [Persona]
+    @Query(sort: \Persona.createdAt, order: .reverse) private var allPersonas: [Persona]
     
     @State private var viewModel: FeedViewModel?
     @State private var isFollowing: Bool = false
     @State private var showUnfollowConfirmation: Bool = false
     
-    private var anyMyPersona: Persona? { myPersonas.first }
-    private var isOwnProfile: Bool { persona.isUserOwned }
+    private var anyPersona: Persona? { allPersonas.first }
     
     private var personaPosts: [Post] {
         allPosts.filter { $0.author?.id == persona.id }
@@ -27,14 +26,8 @@ struct PersonaDetailView: View {
                 // Avatar and name
                 profileHeader
                 
-                // Action buttons
-                if isOwnProfile {
-                    // Own Persona: show management actions + follow button
-                    ownProfileActions
-                } else {
-                    // Other Persona: show follow button only
-                    followButton
-                }
+                // Action buttons (all Personas have full management features)
+                ownProfileActions
                 
                 // Backstory
                 if !persona.backstory.isEmpty {
@@ -81,12 +74,12 @@ struct PersonaDetailView: View {
             Text(viewModel?.errorMessage ?? "")
         }
         .onAppear {
-            if viewModel == nil && isOwnProfile {
+            if viewModel == nil {
                 viewModel = FeedViewModel(aiService: AIService.shared, modelContext: modelContext)
             }
-            // Check if any of user's Personas is following this persona
-            if let myPersona = anyMyPersona {
-                isFollowing = myPersona.following.contains(where: { $0.id == persona.id })
+            // Check if any Persona is following this persona
+            if let firstPersona = anyPersona {
+                isFollowing = firstPersona.following.contains(where: { $0.id == persona.id })
             }
         }
     }
@@ -229,7 +222,7 @@ struct PersonaDetailView: View {
             .cornerRadius(Constants.CornerRadius.medium)
         }
         .padding(.horizontal)
-        .disabled(anyMyPersona == nil)
+        .disabled(anyPersona == nil)
     }
     
     // MARK: - Backstory Section
@@ -282,21 +275,21 @@ struct PersonaDetailView: View {
     }
     
     private func toggleFollow() {
-        // Use the first user Persona for following (or could show a picker in the future)
-        guard let myPersona = anyMyPersona else { return }
+        // Use the first Persona for following (or could show a picker in the future)
+        guard let firstPersona = anyPersona else { return }
         
         if isFollowing {
             // Unfollow
-            if let index = myPersona.following.firstIndex(where: { $0.id == persona.id }) {
-                myPersona.following.remove(at: index)
+            if let index = firstPersona.following.firstIndex(where: { $0.id == persona.id }) {
+                firstPersona.following.remove(at: index)
             }
-            if let index = persona.followers.firstIndex(where: { $0.id == myPersona.id }) {
+            if let index = persona.followers.firstIndex(where: { $0.id == firstPersona.id }) {
                 persona.followers.remove(at: index)
             }
         } else {
             // Follow
-            myPersona.following.append(persona)
-            persona.followers.append(myPersona)
+            firstPersona.following.append(persona)
+            persona.followers.append(firstPersona)
         }
         
         isFollowing.toggle()

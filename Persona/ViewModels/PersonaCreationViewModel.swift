@@ -73,8 +73,7 @@ final class PersonaCreationViewModel {
             personalityTraits: Array(selectedTraits),
             backstory: backstory,
             voiceStyle: voiceStyle.rawValue,
-            interests: interests,
-            isUserOwned: true
+            interests: interests
         )
         
         if let avatarImage = avatarImage {
