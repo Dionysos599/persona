@@ -37,6 +37,7 @@ struct PersonaApp: App {
             ContentView()
                 .task {
                     await configureAIService()
+                    await initializeMockData()
                 }
         }
         .modelContainer(modelContainer)
@@ -57,5 +58,14 @@ struct PersonaApp: App {
                 model: apiModel
             )
         }
+    }
+    
+    // MARK: - Initial Data Setup
+    
+    @MainActor
+    private func initializeMockData() async {
+        let context = modelContainer.mainContext
+        let service = InitialDataService(modelContext: context)
+        await service.initializeIfNeeded()
     }
 }
